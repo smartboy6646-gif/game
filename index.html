@@ -1,108 +1,124 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Contra Mobile</title>
-    <style>
-        body { margin: 0; overflow: hidden; background: #000; font-family: Arial; }
-        canvas { display: block; background: #222; margin: auto; }
-        
-        /* Mobile Buttons Style */
-        .controls {
-            position: fixed; bottom: 20px; width: 100%;
-            display: flex; justify-content: space-between; padding: 0 20px; box-sizing: border-box;
-        }
-        .btn {
-            width: 60px; height: 60px; background: rgba(255, 255, 255, 0.3);
-            border-radius: 50%; display: flex; align-items: center;
-            justify-content: center; color: white; user-select: none; touch-action: manipulation;
-        }
-        .movement-btns { display: flex; gap: 20px; }
-        .jump-btn { background: rgba(255, 0, 0, 0.5); width: 80px; height: 80px; }
-    </style>
+    <title>Cosmic Defender - Mobile Space Shooter</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-
-    <canvas id="gameCanvas"></canvas>
-
-    <div class="controls">
-        <div class="movement-btns">
-            <div class="btn" id="leftBtn">◀</div>
-            <div class="btn" id="rightBtn">▶</div>
+    <div class="container">
+        <!-- Start Screen -->
+        <div id="startScreen" class="screen active">
+            <h1><i class="fas fa-rocket"></i> COSMIC DEFENDER</h1>
+            <div class="game-info">
+                <p>Defend the galaxy across 5 challenging levels!</p>
+                <div class="controls-info">
+                    <div class="control-item">
+                        <div class="touch-area"></div>
+                        <span>Move Spaceship</span>
+                    </div>
+                    <div class="control-item">
+                        <button class="shoot-btn"><i class="fas fa-bullseye"></i></button>
+                        <span>Fire Weapon</span>
+                    </div>
+                </div>
+            </div>
+            <button id="startBtn" class="btn"><i class="fas fa-play"></i> START MISSION</button>
+            <button id="howToPlayBtn" class="btn secondary"><i class="fas fa-question-circle"></i> HOW TO PLAY</button>
+            <div class="level-select">
+                <h3>Select Level:</h3>
+                <div class="level-buttons">
+                    <button class="level-btn" data-level="1">1</button>
+                    <button class="level-btn" data-level="2">2</button>
+                    <button class="level-btn" data-level="3">3</button>
+                    <button class="level-btn" data-level="4">4</button>
+                    <button class="level-btn" data-level="5">5</button>
+                </div>
+            </div>
         </div>
-        <div class="btn jump-btn" id="jumpBtn">JUMP</div>
+
+        <!-- How to Play Screen -->
+        <div id="howToPlayScreen" class="screen">
+            <h2><i class="fas fa-book"></i> HOW TO PLAY</h2>
+            <div class="instructions">
+                <div class="instruction">
+                    <div class="icon"><i class="fas fa-hand-point-up"></i></div>
+                    <p><strong>Move:</strong> Touch and drag anywhere on screen to move your spaceship</p>
+                </div>
+                <div class="instruction">
+                    <div class="icon"><i class="fas fa-bullseye"></i></div>
+                    <p><strong>Shoot:</strong> Tap the FIRE button or touch the right side of screen to shoot</p>
+                </div>
+                <div class="instruction">
+                    <div class="icon"><i class="fas fa-shield-alt"></i></div>
+                    <p><strong>Health:</strong> Avoid enemy bullets and collisions. You have 3 lives.</p>
+                </div>
+                <div class="instruction">
+                    <div class="icon"><i class="fas fa-star"></i></div>
+                    <p><strong>Power-ups:</strong> Collect stars for extra points and health packs for healing.</p>
+                </div>
+                <div class="instruction">
+                    <div class="icon"><i class="fas fa-trophy"></i></div>
+                    <p><strong>Mission:</strong> Complete all 5 levels by defeating enemy waves and bosses!</p>
+                </div>
+            </div>
+            <button id="backFromHowToBtn" class="btn"><i class="fas fa-arrow-left"></i> BACK</button>
+        </div>
+
+        <!-- Game Screen -->
+        <div id="gameScreen" class="screen">
+            <div class="game-header">
+                <div class="stats">
+                    <div class="stat"><i class="fas fa-heart"></i> <span id="lives">3</span></div>
+                    <div class="stat"><i class="fas fa-bullseye"></i> <span id="score">0</span></div>
+                    <div class="stat"><i class="fas fa-layer-group"></i> <span id="level">1</span>/5</div>
+                </div>
+                <button id="pauseBtn" class="icon-btn"><i class="fas fa-pause"></i></button>
+            </div>
+            
+            <canvas id="gameCanvas"></canvas>
+            
+            <div class="controls">
+                <div class="touch-area-info">Touch & drag here to move</div>
+                <button id="shootBtn" class="shoot-btn"><i class="fas fa-bullseye"></i> FIRE</button>
+            </div>
+        </div>
+
+        <!-- Pause Screen -->
+        <div id="pauseScreen" class="screen">
+            <h2><i class="fas fa-pause"></i> GAME PAUSED</h2>
+            <button id="resumeBtn" class="btn"><i class="fas fa-play"></i> RESUME</button>
+            <button id="restartBtn" class="btn secondary"><i class="fas fa-redo"></i> RESTART LEVEL</button>
+            <button id="quitBtn" class="btn quit"><i class="fas fa-home"></i> QUIT TO MENU</button>
+        </div>
+
+        <!-- Level Complete Screen -->
+        <div id="levelCompleteScreen" class="screen">
+            <h2><i class="fas fa-trophy"></i> LEVEL <span id="completedLevel">1</span> COMPLETE!</h2>
+            <div class="score-summary">
+                <p>Enemies defeated: <span id="enemiesDefeated">0</span></p>
+                <p>Score earned: <span id="levelScore">0</span></p>
+                <p>Total score: <span id="totalScore">0</span></p>
+            </div>
+            <button id="nextLevelBtn" class="btn"><i class="fas fa-forward"></i> NEXT LEVEL</button>
+            <button id="menuFromCompleteBtn" class="btn secondary"><i class="fas fa-home"></i> MAIN MENU</button>
+        </div>
+
+        <!-- Game Over Screen -->
+        <div id="gameOverScreen" class="screen">
+            <h2><i class="fas fa-skull-crossbones"></i> MISSION FAILED</h2>
+            <p class="game-over-text">Your spaceship was destroyed!</p>
+            <div class="final-score">
+                <h3>FINAL SCORE: <span id="finalScore">0</span></h3>
+                <p>Level reached: <span id="finalLevel">1</span></p>
+            </div>
+            <button id="restartGameBtn" class="btn"><i class="fas fa-redo"></i> PLAY AGAIN</button>
+            <button id="menuFromGameOverBtn" class="btn secondary"><i class="fas fa-home"></i> MAIN MENU</button>
+        </div>
     </div>
 
-    <script>
-        const canvas = document.getElementById("gameCanvas");
-        const ctx = canvas.getContext("2d");
-
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight * 0.6; // Screen ko mathillo bhag ma game
-
-        const player = {
-            x: 50, y: 200, width: 30, height: 40,
-            color: "#00ff00", speed: 5, velY: 0, jumping: false
-        };
-
-        const gravity = 0.8;
-        let moveLeft = false;
-        let moveRight = false;
-
-        const platforms = [
-            { x: 0, y: canvas.height - 20, width: canvas.width, height: 20 },
-            { x: 100, y: canvas.height - 100, width: 150, height: 15 },
-            { x: 300, y: canvas.height - 180, width: 150, height: 15 }
-        ];
-
-        // Touch Events for Mobile
-        const setupBtn = (id, startAction, endAction) => {
-            const btn = document.getElementById(id);
-            btn.addEventListener("touchstart", (e) => { e.preventDefault(); startAction(); });
-            btn.addEventListener("touchend", (e) => { e.preventDefault(); endAction(); });
-        };
-
-        setupBtn("leftBtn", () => moveLeft = true, () => moveLeft = false);
-        setupBtn("rightBtn", () => moveRight = true, () => moveRight = false);
-        setupBtn("jumpBtn", () => {
-            if (!player.jumping) {
-                player.velY = -15;
-                player.jumping = true;
-            }
-        }, () => {});
-
-        function update() {
-            if (moveLeft && player.x > 0) player.x -= player.speed;
-            if (moveRight && player.x < canvas.width - player.width) player.x += player.speed;
-
-            player.velY += gravity;
-            player.y += player.velY;
-
-            player.jumping = true;
-            for (let plat of platforms) {
-                if (player.x < plat.x + plat.width &&
-                    player.x + player.width > plat.x &&
-                    player.y + player.height > plat.y &&
-                    player.y + player.height < plat.y + plat.height + player.velY) {
-                    player.jumping = false;
-                    player.velY = 0;
-                    player.y = plat.y - player.height;
-                }
-            }
-
-            draw();
-            requestAnimationFrame(update);
-        }
-
-        function draw() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = "#555";
-            platforms.forEach(p => ctx.fillRect(p.x, p.y, p.width, p.height));
-            ctx.fillStyle = player.color;
-            ctx.fillRect(player.x, player.y, player.width, player.height);
-        }
-
-        update();
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
