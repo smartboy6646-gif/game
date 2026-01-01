@@ -1,0 +1,361 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #0c0c2e 0%, #1a1a3e 100%);
+    color: white;
+    overflow: hidden;
+    height: 100vh;
+    touch-action: manipulation;
+}
+
+.container {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+.screen {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    background: linear-gradient(135deg, #0c0c2e 0%, #1a1a3e 100%);
+    transition: opacity 0.3s;
+    opacity: 0;
+    pointer-events: none;
+    overflow-y: auto;
+}
+
+.screen.active {
+    opacity: 1;
+    pointer-events: all;
+}
+
+h1 {
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+    color: #6ee7ff;
+    text-shadow: 0 0 10px rgba(110, 231, 255, 0.7);
+}
+
+h2 {
+    font-size: 2rem;
+    margin-bottom: 30px;
+    color: #ffcc00;
+}
+
+h3 {
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+    color: #6ee7ff;
+}
+
+.btn {
+    background: linear-gradient(to bottom, #4a6fa5, #2a4a7e);
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    margin: 10px;
+    border-radius: 50px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 80%;
+    max-width: 300px;
+}
+
+.btn:hover, .btn:active {
+    background: linear-gradient(to bottom, #5a8fcf, #3a6aae);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+}
+
+.btn.secondary {
+    background: linear-gradient(to bottom, #6c757d, #495057);
+}
+
+.btn.quit {
+    background: linear-gradient(to bottom, #dc3545, #a71d2a);
+}
+
+.game-info {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 15px;
+    margin: 20px 0;
+    width: 90%;
+    max-width: 500px;
+}
+
+.controls-info {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 20px;
+    flex-wrap: wrap;
+}
+
+.control-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 10px;
+}
+
+.touch-area {
+    width: 80px;
+    height: 80px;
+    background: rgba(255, 255, 255, 0.2);
+    border: 2px dashed #6ee7ff;
+    border-radius: 10px;
+    margin-bottom: 10px;
+}
+
+.shoot-btn {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(to bottom, #ff6b6b, #c44545);
+    border: none;
+    border-radius: 50%;
+    color: white;
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+}
+
+.level-select {
+    margin-top: 30px;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 15px;
+    width: 90%;
+    max-width: 500px;
+}
+
+.level-buttons {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.level-btn {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: linear-gradient(to bottom, #4a6fa5, #2a4a7e);
+    color: white;
+    border: none;
+    font-size: 1.2rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.level-btn:hover, .level-btn:active {
+    background: linear-gradient(to bottom, #5a8fcf, #3a6aae);
+    transform: scale(1.1);
+}
+
+.instructions {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 15px;
+    margin: 20px 0;
+    width: 90%;
+    max-width: 500px;
+    text-align: left;
+}
+
+.instruction {
+    display: flex;
+    align-items: center;
+    margin: 15px 0;
+}
+
+.instruction .icon {
+    width: 40px;
+    height: 40px;
+    background: rgba(110, 231, 255, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 15px;
+    font-size: 1.2rem;
+    color: #6ee7ff;
+}
+
+/* Game Screen */
+#gameScreen {
+    padding: 10px;
+}
+
+.game-header {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    margin-bottom: 10px;
+}
+
+.stats {
+    display: flex;
+    gap: 20px;
+}
+
+.stat {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 8px 15px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: bold;
+}
+
+.icon-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    color: white;
+    font-size: 1.2rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#gameCanvas {
+    background-color: #0a0a1a;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    width: 100%;
+    max-width: 600px;
+    flex-grow: 1;
+    touch-action: none;
+}
+
+.controls {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 0;
+    margin-top: 10px;
+}
+
+.touch-area-info {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    flex-grow: 1;
+    margin-right: 20px;
+}
+
+/* Score Screens */
+.score-summary, .final-score {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 15px;
+    margin: 20px 0;
+    width: 90%;
+    max-width: 500px;
+}
+
+.score-summary p, .final-score p {
+    margin: 10px 0;
+    font-size: 1.1rem;
+}
+
+.game-over-text {
+    font-size: 1.3rem;
+    color: #ff6b6b;
+    margin-bottom: 20px;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    h1 {
+        font-size: 2rem;
+    }
+    
+    h2 {
+        font-size: 1.7rem;
+    }
+    
+    .btn {
+        padding: 12px 25px;
+        font-size: 1rem;
+    }
+    
+    .stats {
+        gap: 10px;
+    }
+    
+    .stat {
+        padding: 6px 12px;
+        font-size: 0.9rem;
+    }
+    
+    .controls {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .touch-area-info {
+        margin-right: 0;
+        margin-bottom: 10px;
+        text-align: center;
+    }
+}
+
+@media (max-height: 700px) {
+    .screen {
+        padding: 10px;
+    }
+    
+    h1 {
+        font-size: 1.8rem;
+        margin-bottom: 15px;
+    }
+    
+    h2 {
+        font-size: 1.5rem;
+        margin-bottom: 20px;
+    }
+    
+    .btn {
+        padding: 10px 20px;
+        margin: 5px;
+    }
+}
