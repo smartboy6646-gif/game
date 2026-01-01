@@ -2,65 +2,100 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Idle Factory Simulator</title>
+<title>Visual Factory Simulator</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: linear-gradient(135deg, #1e1e2f, #2b2b4f);
-  color: #fff;
-  text-align: center;
+body{
+  margin:0;
+  background:#1c1c2b;
+  font-family:Arial;
+  color:#fff;
+  text-align:center;
 }
 
-.container {
-  padding: 20px;
-  max-width: 500px;
-  margin: auto;
+.container{
+  max-width:600px;
+  margin:auto;
+  padding:20px;
 }
 
-h1 {
-  margin-bottom: 5px;
+.factory{
+  background:#2b2b44;
+  border-radius:15px;
+  padding:20px;
+  position:relative;
+  height:220px;
+  overflow:hidden;
 }
 
-.stats {
-  background: #111;
-  padding: 15px;
-  border-radius: 10px;
-  margin-bottom: 20px;
+.machine{
+  width:80px;
+  height:80px;
+  border:8px solid #4caf50;
+  border-top:8px solid transparent;
+  border-radius:50%;
+  margin:auto;
+  animation:spin 2s linear infinite;
 }
 
-.stats p {
-  font-size: 18px;
-  margin: 8px 0;
+@keyframes spin{
+  0%{transform:rotate(0deg);}
+  100%{transform:rotate(360deg);}
 }
 
-button {
-  width: 100%;
-  padding: 15px;
-  margin: 10px 0;
-  font-size: 18px;
-  border: none;
-  border-radius: 10px;
-  cursor: pointer;
-  background: #4caf50;
-  color: #fff;
-  transition: transform 0.1s, background 0.3s;
+.worker{
+  width:40px;
+  height:60px;
+  background:#ff9800;
+  border-radius:10px;
+  position:absolute;
+  bottom:20px;
+  left:20px;
+  animation:walk 3s ease-in-out infinite;
 }
 
-button:hover {
-  background: #43a047;
+@keyframes walk{
+  0%{left:20px;}
+  50%{left:520px;}
+  100%{left:20px;}
 }
 
-button:active {
-  transform: scale(0.95);
+.box{
+  width:30px;
+  height:30px;
+  background:#03a9f4;
+  position:absolute;
+  top:120px;
+  left:50%;
+  border-radius:5px;
+  animation:moveBox 2s linear forwards;
 }
 
-.footer {
-  margin-top: 20px;
-  font-size: 14px;
-  opacity: 0.7;
+@keyframes moveBox{
+  from{top:120px;}
+  to{top:180px; opacity:0;}
+}
+
+.stats{
+  margin-top:15px;
+  font-size:18px;
+}
+
+button{
+  width:100%;
+  padding:15px;
+  margin-top:10px;
+  font-size:18px;
+  border:none;
+  border-radius:10px;
+  background:#4caf50;
+  color:#fff;
+}
+
+.footer{
+  margin-top:15px;
+  opacity:0.6;
 }
 </style>
 </head>
@@ -68,73 +103,58 @@ button:active {
 <body>
 
 <div class="container">
-  <h1>🏭 Idle Factory Simulator</h1>
-  <p>Build your factory and earn money!</p>
+<h2>🏭 Visual Factory Simulator</h2>
 
-  <div class="stats">
-    <p>💰 Money: <span id="money">0</span></p>
-    <p>⚙️ Factory Level: <span id="level">1</span></p>
-    <p>👷 Workers: <span id="workers">0</span></p>
-    <p>⏱️ Income/sec: <span id="income">1</span></p>
-  </div>
+<div class="factory" id="factory">
+  <div class="machine"></div>
+  <div class="worker"></div>
+</div>
 
-  <button onclick="upgradeFactory()">Upgrade Factory (Cost: <span id="upgradeCost">50</span>)</button>
-  <button onclick="hireWorker()">Hire Worker (Cost: <span id="workerCost">30</span>)</button>
+<div class="stats">
+  💰 Money: <span id="money">0</span><br>
+  📦 Boxes Produced: <span id="boxes">0</span>
+</div>
 
-  <div class="footer">
-    By Ronnie Ruchal
-  </div>
+<button onclick="upgrade()">Upgrade Factory (₹50)</button>
+
+<div class="footer">By Ronnie Ruchal</div>
 </div>
 
 <script>
 let money = 0;
-let level = 1;
-let workers = 0;
-let income = 1;
+let boxes = 0;
+let speed = 2000;
 
-let upgradeCost = 50;
-let workerCost = 30;
+function produceBox(){
+  const box = document.createElement("div");
+  box.className = "box";
+  document.getElementById("factory").appendChild(box);
 
-function updateUI() {
-  document.getElementById("money").innerText = Math.floor(money);
-  document.getElementById("level").innerText = level;
-  document.getElementById("workers").innerText = workers;
-  document.getElementById("income").innerText = income;
-  document.getElementById("upgradeCost").innerText = upgradeCost;
-  document.getElementById("workerCost").innerText = workerCost;
+  setTimeout(()=>{
+    box.remove();
+    boxes++;
+    money += 5;
+    updateUI();
+  },2000);
 }
 
-function upgradeFactory() {
-  if (money >= upgradeCost) {
-    money -= upgradeCost;
-    level++;
-    income += 2;
-    upgradeCost = Math.floor(upgradeCost * 1.5);
-    updateUI();
-  } else {
-    alert("Not enough money!");
+function updateUI(){
+  document.getElementById("money").innerText = money;
+  document.getElementById("boxes").innerText = boxes;
+}
+
+function upgrade(){
+  if(money>=50){
+    money -=50;
+    speed = Math.max(700, speed-300);
+    clearInterval(factoryLoop);
+    factoryLoop = setInterval(produceBox, speed);
+  }else{
+    alert("Money kam xa!");
   }
 }
 
-function hireWorker() {
-  if (money >= workerCost) {
-    money -= workerCost;
-    workers++;
-    income += 1;
-    workerCost = Math.floor(workerCost * 1.4);
-    updateUI();
-  } else {
-    alert("Not enough money!");
-  }
-}
-
-// Idle income
-setInterval(() => {
-  money += income;
-  updateUI();
-}, 1000);
-
-updateUI();
+let factoryLoop = setInterval(produceBox, speed);
 </script>
 
 </body>
