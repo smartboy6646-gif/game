@@ -2,41 +2,22 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Stickman Penalty Tournament V2</title>
+<title>Stickman Penalty Tournament</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
-body{
-    margin:0;
-    background:#0b3d1c;
-    color:#fff;
-    font-family:Arial;
-    text-align:center;
-}
-canvas{
-    background:#1e7f3f;
-    display:block;
-    margin:auto;
-}
-button{
-    padding:8px 14px;
-    margin:4px;
-    border:none;
-    border-radius:5px;
-    cursor:pointer;
-}
-#ui{padding:10px;font-size:14px}
-.fade{opacity:0.3}
+body{margin:0;background:#0b2e13;color:#fff;font-family:Arial;text-align:center}
+canvas{background:#1f7a3a;display:block;margin:auto}
+#ui{padding:8px;font-size:14px}
 </style>
 </head>
 <body>
 
-<h3>⚽ Stickman Penalty Tournament (V2)</h3>
+<h3>⚽ Stickman Penalty Tournament</h3>
 <div id="ui"></div>
 <canvas id="game" width="360" height="520"></canvas>
 
 <script>
-const canvas=document.getElementById("game");
-const ctx=canvas.getContext("2d");
+const c=document.getElementById("game"),ctx=c.getContext("2d");
 const ui=document.getElementById("ui");
 
 const teams=[
@@ -46,100 +27,89 @@ const teams=[
 "Australia","Denmark","Poland","Serbia","Switzerland","Sweden","Chile","Colombia"
 ];
 
-let userTeam=null;
-let roundTeams=[],nextRound=[];
-let matchIndex=0;
-let scoreA=0,scoreB=0,shot=0;
+const rounds={32:"Round of 32",16:"Round of 16",8:"Quarter Final",4:"Semi Final",2:"Final"};
+
+let teamColors={};
+teams.forEach(t=>teamColors[t]=`hsl(${Math.random()*360},80%,60%)`);
+
+let userTeam=null,roundTeams=[],nextRound=[];
+let matchIndex=0,matchNo=1;
+let scoreA=0,scoreB=0,kickCount=0;
+let suddenDeath=false;
 let state="select";
-let ball={x:180,y:360,dx:0,dy:0,move:false};
-let history=[];
 
-const roundNames={
-32:"Round of 32",
-16:"Round of 16",
-8:"Quarter Final",
-4:"Semi Final",
-2:"Final"
-};
+let ball={x:180,y:360,vx:0,vy:0,move:false};
 
-function stickman(x,y){
-ctx.strokeStyle="#fff";
-ctx.lineWidth=2;
+function drawGround(){
+ctx.fillStyle="#1f7a3a";ctx.fillRect(0,0,c.width,c.height);
+ctx.strokeStyle="#fff";ctx.lineWidth=2;
+ctx.strokeRect(60,70,240,120); // penalty box
+ctx.strokeRect(110,70,140,60); // goal box
+ctx.beginPath();ctx.arc(180,360,5,0,Math.PI*2);ctx.fill();
+ctx.strokeRect(120,80,120,40); // goal
+}
+
+function stickman(x,y,color,kick=false){
+ctx.strokeStyle=color;ctx.lineWidth=3;
 ctx.beginPath();
 ctx.arc(x,y-15,8,0,Math.PI*2);
 ctx.moveTo(x,y-7);ctx.lineTo(x,y+20);
 ctx.moveTo(x,y);ctx.lineTo(x-10,y+10);
 ctx.moveTo(x,y);ctx.lineTo(x+10,y+10);
+if(kick){
+ctx.moveTo(x,y+20);ctx.lineTo(x+15,y+30);
+}else{
 ctx.moveTo(x,y+20);ctx.lineTo(x-8,y+35);
 ctx.moveTo(x,y+20);ctx.lineTo(x+8,y+35);
-ctx.stroke();
 }
-
-function goalPost(){
-ctx.strokeStyle="#fff";
-ctx.strokeRect(110,80,140,50);
+ctx.stroke();
 }
 
 function drawBall(){
 ctx.fillStyle="#fff";
-ctx.beginPath();
-ctx.arc(ball.x,ball.y,6,0,Math.PI*2);
-ctx.fill();
-}
-
-function selectUI(){
-ui.innerHTML="<b>Select Your Team</b><br>";
-teams.forEach(t=>{
-let b=document.createElement("button");
-b.innerText=t;
-b.onclick=()=>{
-userTeam=t;
-roundTeams=[...teams];
-state="play";
-};
-ui.appendChild(b);
-});
-}
-
-function startMatch(){
-scoreA=0;scoreB=0;shot=0;
-state="kick";
+ctx.beginPath();ctx.arc(ball.x,ball.y,6,0,Math.PI*2);ctx.fill();
 }
 
 function shoot(){
 let goal=Math.random()>0.4;
 ball.move=true;
-ball.dx=(Math.random()*4)-2;
-ball.dy=-5;
+ball.vx=(Math.random()*4)-2;
+ball.vy=-6;
+
 setTimeout(()=>{
-ball.move=false;
-ball.x=180;ball.y=360;
+ball.move=false;ball.x=180;ball.y=360;
 if(goal){
-if(shot%2===0)scoreA++; else scoreB++;
+if(kickCount%2===0)scoreA++; else scoreB++;
 }
-shot++;
-if(shot>=10)finishMatch();
+kickCount++;
+
+if(kickCount>=10 && scoreA!==scoreB){
+endMatch();
+}
+if(kickCount>=10 && scoreA===scoreB){
+suddenDeath=true;
+}
+if(suddenDeath && scoreA!==scoreB){
+endMatch();
+}
 },600);
 }
 
-function finishMatch(){
+function endMatch(){
 let A=roundTeams[matchIndex];
 let B=roundTeams[matchIndex+1];
-let winner=scoreA>=scoreB?A:B;
-let loser =scoreA>=scoreB?B:A;
+let winner=scoreA>scoreB?A:B;
 nextRound.push(winner);
-history.push(`${A} ${scoreA} - ${scoreB} ${B}`);
 state="result";
-
 setTimeout(()=>{
-matchIndex+=2;
+matchIndex+=2;matchNo++;
 if(matchIndex>=roundTeams.length){
 roundTeams=[...nextRound];
 nextRound=[];
 matchIndex=0;
 }
 if(roundTeams.length===1){
-ui.innerHTML=`🏆 CHAMPION: ${roundTeams[0]}`;
+ui.innerHTML=`🏆 WINNER: <b>${roundTeams[0]}</b>`;
 state="end";
 }else{
 startMatch();
@@ -147,29 +117,38 @@ startMatch();
 },2000);
 }
 
-function draw(){
-ctx.clearRect(0,0,canvas.width,canvas.height);
-
-if(state==="play"){
-ui.innerHTML=`<b>${roundNames[roundTeams.length]}</b><br>Your Team: ${userTeam}`;
-startMatch();
+function startMatch(){
+scoreA=0;scoreB=0;kickCount=0;
+suddenDeath=false;
+state="play";
 }
 
-if(state==="kick"){
-let A=roundTeams[matchIndex];
-let B=roundTeams[matchIndex+1];
+function draw(){
+ctx.clearRect(0,0,c.width,c.height);
 
-ctx.fillText(A,30,30);
-ctx.fillText(B,260,30);
-ctx.fillText(`Score ${scoreA} - ${scoreB}`,140,55);
+if(state==="select"){
+ui.innerHTML="<b>Select Your Team</b><br>";
+teams.forEach(t=>{
+let b=document.createElement("button");
+b.innerText=t;b.style.background=teamColors[t];
+b.onclick=()=>{userTeam=t;roundTeams=[...teams];startMatch()};
+ui.appendChild(b);
+});
+state="wait";
+}
 
-goalPost();
-stickman(180,380);
-stickman(180,150);
+if(state==="play"){
+let A=roundTeams[matchIndex],B=roundTeams[matchIndex+1];
+ui.innerHTML=`${rounds[roundTeams.length]} | Match ${matchNo}<br>
+<span style="color:${teamColors[A]}">${A}</span> ${scoreA} - ${scoreB}
+<span style="color:${teamColors[B]}">${B}</span>`;
+
+drawGround();
+stickman(180,380,teamColors[A],kickCount%2===0);
+stickman(180,150,teamColors[B]);
 
 if(ball.move){
-ball.x+=ball.dx;
-ball.y+=ball.dy;
+ball.x+=ball.vx;ball.y+=ball.vy;
 }
 drawBall();
 
@@ -179,13 +158,13 @@ shoot();
 }
 
 if(state==="result"){
-ctx.fillText(history[history.length-1],70,250);
+ctx.fillStyle="#fff";
+ctx.fillText("Winner decided...",120,260);
 }
 
 requestAnimationFrame(draw);
 }
 
-selectUI();
 draw();
 </script>
 </body>
