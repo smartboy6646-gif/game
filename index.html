@@ -1,140 +1,252 @@
 <!DOCTYPE html>
-<html lang="ne">
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>नेपाली Hangman</title>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gully Cricket Scorer - 2 Innings</title>
+    <style>
+        :root {
+            --primary: #0d47a1;
+            --secondary: #b71c1c;
+            --accent: #2e7d32;
+            --bg: #f0f2f5;
+        }
 
-<style>
-body{
-  font-family:'Noto Sans Devanagari',sans-serif;
-  background:#111;
-  color:#fff;
-  text-align:center;
-  padding:20px;
-}
-.game{
-  max-width:500px;
-  margin:auto;
-  background:#1e1e1e;
-  padding:20px;
-  border-radius:12px;
-}
-#word{
-  font-size:32px;
-  letter-spacing:8px;
-  margin:20px 0;
-}
-.key{
-  padding:10px;
-  margin:4px;
-  font-size:18px;
-  background:#333;
-  color:#fff;
-  border:none;
-  border-radius:6px;
-}
-.key:disabled{
-  background:#555;
-}
-#hint{color:#aaa;}
-#life{font-size:20px;margin:10px;}
-#hangman{font-size:20px;white-space:pre;}
-button.restart{
-  margin-top:15px;
-  padding:10px 20px;
-  font-size:18px;
-}
-</style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: var(--bg);
+            display: flex;
+            justify-content: center;
+            padding: 20px 0;
+            margin: 0;
+        }
+
+        .calculator-card {
+            background: white;
+            width: 95%;
+            max-width: 450px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            padding: 20px;
+        }
+
+        .match-header {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .team-input {
+            border: none;
+            border-bottom: 2px solid #ccc;
+            font-size: 1rem;
+            font-weight: bold;
+            text-align: center;
+            width: 40%;
+            padding: 5px;
+        }
+
+        .score-box {
+            background: linear-gradient(135deg, var(--primary), #1976d2);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .score-box h1 { font-size: 3.5rem; margin: 10px 0; }
+        .badge { background: rgba(255,255,255,0.2); padding: 5px 15px; border-radius: 20px; font-size: 0.9rem; }
+
+        .target-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .info-card {
+            background: #fff9c4;
+            padding: 10px;
+            border-radius: 10px;
+            text-align: center;
+            font-weight: bold;
+            border: 1px solid #fbc02d;
+        }
+
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+
+        button {
+            padding: 15px 5px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-run { background: #eeeeee; }
+        .btn-bound { background: #ffd600; }
+        .btn-extra { background: #ff9100; color: white; }
+        .btn-wicket { background: var(--secondary); color: white; grid-column: span 2; }
+        .btn-undo { background: #607d8b; color: white; grid-column: span 2; }
+        .btn-switch { background: var(--accent); color: white; grid-column: span 4; margin-top: 10px; }
+
+        .history-section {
+            margin-top: 20px;
+            border-top: 1px solid #ddd;
+            padding-top: 10px;
+        }
+
+        .ball-trail {
+            display: flex;
+            gap: 5px;
+            overflow-x: auto;
+            padding: 10px 0;
+            flex-direction: row-reverse;
+        }
+
+        .ball {
+            min-width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .w { background: var(--secondary); color: white; }
+        .ex { background: var(--accent); color: white; }
+    </style>
 </head>
-
 <body>
 
-<div class="game">
-<h2>🎯 नेपाली Hangman</h2>
+<div class="calculator-card">
+    <div class="match-header">
+        <input type="text" id="t1" class="team-input" value="TEAM A">
+        <span>VS</span>
+        <input type="text" id="t2" class="team-input" value="TEAM B">
+    </div>
 
-<div id="hint"></div>
-<div id="life"></div>
-<div id="hangman"></div>
-<div id="word"></div>
+    <div class="score-box">
+        <span class="badge" id="innings-label">1ST INNINGS</span>
+        <h1 id="main-score">0 - 0</h1>
+        <p>Overs: <span id="display-overs">0.0</span></p>
+    </div>
 
-<div id="keyboard"></div>
+    <div class="target-info" id="target-ui" style="display: none;">
+        <div class="info-card">Target: <span id="val-target">0</span></div>
+        <div class="info-card" style="background: #e1f5fe; border-color: #03a9f4;">
+            Need: <span id="val-need">0</span>
+        </div>
+    </div>
 
-<button class="restart" onclick="newGame()">🔁 फेरि खेल</button>
+    <div class="controls">
+        <button class="btn-run" onclick="addRun(0)">0</button>
+        <button class="btn-run" onclick="addRun(1)">1</button>
+        <button class="btn-run" onclick="addRun(2)">2</button>
+        <button class="btn-run" onclick="addRun(3)">3</button>
+        <button class="btn-bound" onclick="addRun(4)">4</button>
+        <button class="btn-bound" onclick="addRun(6)">6</button>
+        <button class="btn-extra" onclick="addExtra('WD')">WD</button>
+        <button class="btn-extra" onclick="addExtra('NB')">NB</button>
+        <button class="btn-wicket" onclick="wicket()">WICKET</button>
+        <button class="btn-undo" onclick="undo()">UNDO</button>
+        <button class="btn-switch" id="switch-btn" onclick="switchInnings()">START 2ND INNINGS</button>
+    </div>
+
+    <div class="history-section">
+        <strong>Ball History:</strong>
+        <div class="ball-trail" id="ball-log"></div>
+    </div>
 </div>
 
 <script>
-const words=[
- {word:"विद्यालय",hint:"पढाइ हुने स्थान"},
- {word:"संविधान",hint:"देशको कानुन"},
- {word:"संस्कृति",hint:"परम्परा"},
- {word:"गाई",hint:"दुध दिने जनावर"}
-];
+    let score = 0, wickets = 0, balls = 0;
+    let innings = 1;
+    let target = 0;
+    let history = [];
 
-const letters="कखगघङचछजझञटठडढणतथदधनपफबभमयरलवशषसह".split("");
+    function updateUI() {
+        document.getElementById('main-score').innerText = `${score} - ${wickets}`;
+        document.getElementById('display-overs').innerText = Math.floor(balls/6) + "." + (balls%6);
+        
+        if (innings === 2) {
+            let need = target - score;
+            document.getElementById('val-need').innerText = need < 0 ? "Target Reached" : need;
+            if (need <= 0) alert("BATTING TEAM WON!");
+        }
+    }
 
-let word="",hint="",guessed=[],life=5;
+    function addRun(r) {
+        save();
+        score += r;
+        balls++;
+        log(r, "");
+        updateUI();
+    }
 
-function newGame(){
- let r=words[Math.floor(Math.random()*words.length)];
- word=r.word; hint=r.hint;
- guessed=[]; life=5;
- document.getElementById("hint").innerText="💡 संकेत: "+hint;
- createKeyboard();
- update();
-}
+    function addExtra(type) {
+        save();
+        score += 1;
+        log(type, "ex");
+        updateUI();
+    }
 
-function createKeyboard(){
- let k="";
- letters.forEach(l=>{
-  k+=`<button class="key" onclick="guess('${l}',this)">${l}</button>`;
- });
- document.getElementById("keyboard").innerHTML=k;
-}
+    function wicket() {
+        if (wickets < 10) {
+            save();
+            wickets++;
+            balls++;
+            log("W", "w");
+            updateUI();
+        }
+    }
 
-function guess(l,btn){
- btn.disabled=true;
- if(word.includes(l)){
-  guessed.push(l);
- }else{
-  life--;
- }
- update();
-}
+    function switchInnings() {
+        if (innings === 1) {
+            target = score + 1;
+            innings = 2;
+            score = 0; wickets = 0; balls = 0;
+            document.getElementById('innings-label').innerText = "2ND INNINGS";
+            document.getElementById('target-ui').style.display = "grid";
+            document.getElementById('val-target').innerText = target;
+            document.getElementById('switch-btn').innerText = "RESET MATCH";
+            document.getElementById('ball-log').innerHTML = "";
+            updateUI();
+        } else {
+            location.reload(); // Simple reset
+        }
+    }
 
-function update(){
- document.getElementById("life").innerText="❤️ जीवन: "+life;
- document.getElementById("word").innerText=
-  word.split("").map(c=>guessed.includes(c)?c:"_").join(" ");
- document.getElementById("hangman").innerText=draw();
+    function log(val, cls) {
+        const div = document.createElement('div');
+        div.className = `ball ${cls}`;
+        div.innerText = val;
+        document.getElementById('ball-log').appendChild(div);
+    }
 
- if(life==0){
-  alert("😢 हार भयो! शब्द: "+word);
-  disableKeys();
- }
- if(!document.getElementById("word").innerText.includes("_")){
-  alert("🎉 तपाईं जित्नुभयो!");
-  disableKeys();
- }
-}
+    function save() {
+        history.push({s: score, w: wickets, b: balls, html: document.getElementById('ball-log').innerHTML});
+    }
 
-function draw(){
- return [
-  "",
-  "🙂",
-  "🙂\n |",
-  "🙂\n/|",
-  "🙂\n/|\\",
-  "🙂\n/|\\\n/ \\"
- ][5-life];
-}
-
-function disableKeys(){
- document.querySelectorAll(".key").forEach(b=>b.disabled=true);
-}
-
-newGame();
+    function undo() {
+        if (history.length > 0) {
+            let last = history.pop();
+            score = last.s; wickets = last.w; balls = last.b;
+            document.getElementById('ball-log').innerHTML = last.html;
+            updateUI();
+        }
+    }
 </script>
-
 </body>
 </html>
